@@ -41,10 +41,12 @@ pl = read.csv("Players.csv")
 st = read.csv("Seasons_Stats.csv")
 df = left_join(st, pl, by="Player")
 df <- subset(df, Year >= 2016)
+df$PPM <- df$PTS / df$MP
 drops <- c("Year", "blanl", "blank2", "collage", "birth_city", "born", "Player")
 df <- df[, !(names(df) %in% drops)]
 df = subset(df, MP > 0)
 ```
+
 
 # Univariate Plots Section
 
@@ -63,6 +65,12 @@ summary(df)
 
 Our dataset consists of 52 variables, with the majority of the metrics coming
 from https://www.basketball-reference.com/about/glossary.html.
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=G), data = df) +
+  geom_histogram(binwidth = 4) +
+  xlab("Games")
+```
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=PTS), data = df) +
@@ -87,6 +95,83 @@ ggplot(aes(x=MP), data = df) +
   geom_histogram(binwidth = 50) +
   xlab("Minutes Played")
 ```
+
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=PPM), data = df) +
+  geom_histogram(binwidth = .05) +
+  xlab("Points Per Minute")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=FG.), data = df) +
+  geom_histogram(binwidth = 0.01) +
+  xlab("Field Goal %")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=FT.), data = df) +
+  geom_histogram(binwidth = 0.01) +
+  xlab("Free Throw %")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=X3P.), data = df) +
+  geom_histogram(binwidth = 0.01) +
+  xlab("3-Point %")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=X2P.), data = df) +
+  geom_histogram(binwidth = 0.01) +
+  xlab("2-Point %")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=AST.), data = df) +
+  geom_histogram(binwidth = 1) +
+  xlab("Assists")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=STL), data = df) +
+  geom_histogram(binwidth = 1) +
+  xlab("steals")
+```
+
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=ORB), data = df) +
+  geom_histogram(binwidth = 5) +
+  xlab("offensive rebound")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=height), data = df) +
+  geom_histogram(binwidth = 5)
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=Age), data = df) +
+  geom_histogram(binwidth = 1)
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=weight), data = df) +
+  geom_histogram(binwidth = 5)
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=Pos), data = df) +
+  geom_bar()
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=TOV), data = df) +
+  geom_histogram(binwidth = 10) +
+  xlab("turnover")
+```
+
 
 # Univariate Analysis
 
