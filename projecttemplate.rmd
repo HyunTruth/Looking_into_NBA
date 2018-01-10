@@ -73,6 +73,12 @@ ggplot(aes(x=G), data = df) +
 ```
 
 ```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=PTS+1), data = df) +
+  geom_histogram(bins=200) +
+  scale_x_log10() +
+  xlab("Total Points")
+```
+```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=PTS), data = df) +
   geom_histogram(binwidth = 50) +
   xlab("Total Points")
@@ -142,8 +148,11 @@ ggplot(aes(x=X3P.), data = df) +
 
 All four of the field goal related features show a normal-like curve, with some
 outliers. We can estimate that a high 0% on the 3-pointer% may indicate also 
-The lack of shooting 3-pointer by the athlete (n=0), as well as all misses by 
+the lack of shooting 3-pointer by the athlete (n=0), as well as all misses by 
 the athlete. 
+
+Since we checked the field goals already, let's check other numbers that conjure
+an offense - assist, steal, offensive rebound, and turnover.
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=AST.), data = df) +
@@ -153,7 +162,7 @@ ggplot(aes(x=AST.), data = df) +
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=STL), data = df) +
-  geom_histogram(binwidth = 1) +
+  geom_histogram(binwidth = 5) +
   xlab("steals")
 ```
 
@@ -163,15 +172,19 @@ ggplot(aes(x=ORB), data = df) +
   geom_histogram(binwidth = 5) +
   xlab("offensive rebound")
 ```
+While assist has formed a normal-like distribution, both steal and offensive
+rebound forms a long-tailed graph. Lastly, we will examine the profiles of the
+athletes, with height, weight, age, and position.
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=TOV), data = df) +
+  geom_histogram(binwidth = 10) +
+  xlab("turnover")
+```
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=height), data = df) +
   geom_histogram(binwidth = 5)
-```
-
-```{r echo=FALSE, Univariate_Plots}
-ggplot(aes(x=Age), data = df) +
-  geom_histogram(binwidth = 1)
 ```
 
 ```{r echo=FALSE, Univariate_Plots}
@@ -180,15 +193,23 @@ ggplot(aes(x=weight), data = df) +
 ```
 
 ```{r echo=FALSE, Univariate_Plots}
-ggplot(aes(x=Pos), data = df) +
-  geom_bar()
+ggplot(aes(x=height / weight), data = df) +
+  geom_histogram(binwidth = 0.05)
+```
+height-weight ratio has a normal-like distribution.
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=Age), data = df) +
+  geom_histogram(binwidth = 1)
 ```
 
 ```{r echo=FALSE, Univariate_Plots}
-ggplot(aes(x=TOV), data = df) +
-  geom_histogram(binwidth = 10) +
-  xlab("turnover")
+ggplot(aes(x=Pos), data = df) +
+  geom_bar()
 ```
+Lack of multi-position players indicates that in modern basketball, position is
+very specific and well-defined.
+
 
 
 # Univariate Analysis
