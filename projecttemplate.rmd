@@ -87,8 +87,8 @@ ggplot(aes(x=PTS+1), data = df) +
 
 Transformed the long-tail data using log10, to better understand the
 distribution of total points between players. There seems to be a unimodal peak
-near 1000 region. How about the minutes played?
-
+near 1000 region. Generally, more minutes played, more chance for points an 
+athelete gets. So, how about the minutes played?
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=MP), data = df) +
@@ -96,6 +96,9 @@ ggplot(aes(x=MP), data = df) +
   xlab("Minutes Played")
 ```
 
+Both total points and minutes played show a similar pyramidic pattern, with only
+a handful making their way up top. Then, I wonder, would points per minute 
+played be drastically different from those patterns?
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=PPM), data = df) +
@@ -103,16 +106,32 @@ ggplot(aes(x=PPM), data = df) +
   xlab("Points Per Minute")
 ```
 
+Quite surprisingly, points per minute actually shows a unimodal, normal-like 
+curve with the mean around 0.4, with some glaring outliers.
+
+Now that we examined PTS & minutes played, I want to examine other indicators
+that conjure up the offense. For field goals, I believe that the FG% is a
+better indicator of a scorer's ability than numbers made or attempted, so I will
+examine that as a main feature of field goal.
+
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=FG.), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("Field Goal %")
 ```
 
+Similarly, free throw % and 2-pointer / 3-pointer % will be examined instead of
+made and attempted.
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=FT.), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("Free Throw %")
+```
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(aes(x=X2P.), data = df) +
+  geom_histogram(binwidth = 0.01) +
+  xlab("2-Point %")
 ```
 
 ```{r echo=FALSE, Univariate_Plots}
@@ -121,11 +140,10 @@ ggplot(aes(x=X3P.), data = df) +
   xlab("3-Point %")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
-ggplot(aes(x=X2P.), data = df) +
-  geom_histogram(binwidth = 0.01) +
-  xlab("2-Point %")
-```
+All four of the field goal related features show a normal-like curve, with some
+outliers. We can estimate that a high 0% on the 3-pointer% may indicate also 
+The lack of shooting 3-pointer by the athlete (n=0), as well as all misses by 
+the athlete. 
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot(aes(x=AST.), data = df) +
