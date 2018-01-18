@@ -322,19 +322,28 @@ field goal percentage, including 2-pointer% and 3-pointer%.
 
 ```{r echo=FALSE, Bivariate_Plots}
 ggplot(aes(x=FG., y=PPM), data = df) +
-  geom_jitter(alpha = 0.2)
+  geom_jitter(alpha = 0.2) +
+  geom_smooth(method = "lm")
 ```
 
 ```{r echo=FALSE, Bivariate_Plots}
 ggplot(aes(x=X2P., y=PPM), data = df) +
-  geom_jitter(alpha = 0.2)
+  geom_jitter(alpha = 0.2) +
+  geom_smooth(method = "lm")
 ```
 
 ```{r echo=FALSE, Bivariate_Plots}
 ggplot(aes(x=X3P., y=PPM), data = df) +
-  geom_jitter(alpha = 0.2)
+  geom_jitter(alpha = 0.2) +
+  geom_smooth(method = "lm")
 ```
 
+
+```{r echo=FALSE, Bivariate_Plots}
+ggplot(aes(x=X3P., y=PPM), data = df) +
+  geom_jitter(alpha = 0.2) +
+  geom_smooth(method = "lm")
+```
 # Bivariate Analysis
 
 > **Tip**: As before, summarize what you found in your bivariate explorations
