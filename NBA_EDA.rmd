@@ -327,23 +327,43 @@ ggplot(aes(x=FG., y=PPM), data = df) +
 ```
 
 ```{r echo=FALSE, Bivariate_Plots}
+cor(x = df$FG., y = df$PPM, use = "complete.obs")
+```
+
+```{r echo=FALSE, Bivariate_Plots}
 ggplot(aes(x=X2P., y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm")
 ```
 
 ```{r echo=FALSE, Bivariate_Plots}
-ggplot(aes(x=X3P., y=PPM), data = df) +
-  geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")
+cor(x = df$X2P., y = df$PPM, use = "complete.obs")
 ```
-
 
 ```{r echo=FALSE, Bivariate_Plots}
 ggplot(aes(x=X3P., y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm")
 ```
+
+```{r echo=FALSE, Bivariate_Plots}
+cor(x = df$X3P, y = df$PPM, use = "complete.obs")
+```
+
+```{r echo=FALSE, Bivariate_Plots}
+ggplot(aes(x=FT., y=PPM), data = df) +
+  geom_jitter(alpha = 0.2) +
+  geom_smooth(method = "lm")
+```
+
+```{r echo=FALSE, Bivariate_Plots}
+cor(x = df$FT., y = df$PPM, use = "complete.obs")
+```
+
+```{r echo=FALSE, Bivariate_Plots}
+cor(x = df$X3P., y = df$PPM, use = "complete.obs")
+```
+
 # Bivariate Analysis
 
 > **Tip**: As before, summarize what you found in your bivariate explorations
