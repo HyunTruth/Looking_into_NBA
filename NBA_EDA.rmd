@@ -302,7 +302,7 @@ minute and field goal percentage.
 ### Did you create any new variables from existing variables in the dataset?
 Points per minute(PPM) variable was derived from (total points scored / minutes
 played). This is a better indicator of the athlete's proficiency in scoring than
-total points scored.
+total points scored, which can be biased by the length of their playing time.
 
 ### Of the features you investigated, were there any unusual distributions? \
 Did you perform any operations on the data to tidy, adjust, or change the form \
@@ -361,7 +361,7 @@ cor(x = df$FT., y = df$PPM, use = "complete.obs")
 ```
 
 ```{r echo=FALSE, Bivariate_Plots}
-cor(x = df$X3P., y = df$PPM, use = "complete.obs")
+cor(x = df$X3PA, y = df$PPM, use = "complete.obs")
 ```
 
 # Bivariate Analysis
