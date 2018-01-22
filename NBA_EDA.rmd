@@ -23,6 +23,9 @@ We are here to find out.
 # want it to. This will clean up the flow of your report.
 library(dplyr)
 library(ggplot2)
+library(gridExtra)
+library(RColorBrewer)
+library(memisc)
 ```
 
 
@@ -35,12 +38,13 @@ atheletes, and 2017 season is incomplete in this dataset, our analysis will
 revolve around the 2016-17 season. It includes all players that were on the 
 roster during 2016-17 season and played more than a minute throughout the season.
 
-```{r echo=FALSE, Load_the_Data}
+```{r echo=FALSE, warning=FALSE, Load_the_Data}
 # Load the Data
 pl = read.csv("Players.csv")
 st = read.csv("Seasons_Stats.csv")
 df = left_join(st, pl, by="Player")
 df <- subset(df, Year == 2016)
+#df <- subset(df, Year >= 2000)
 df$PPM <- df$PTS / df$MP
 df$APM <- df$AST / df$MP
 df$SPM <- df$STL / df$MP
@@ -56,22 +60,22 @@ df = subset(df, MP > 0)
 
 # Univariate Plots Section
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Dimension}
 dim(df)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Columns}
 str(df)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Summary}
 summary(df)
 ```
 
 Our dataset consists of 52 variables, with the majority of the metrics coming
 from https://www.basketball-reference.com/about/glossary.html.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Multi_Position_Players}
 subset(df, Pos == "PF-C" | Pos == "SG-SF")
 which(df$Pos == "PF-C")
 #Channing Frye
@@ -94,23 +98,23 @@ the sample size is big enough that the exemption of one sample will not change
 the statistics dramatically, I've decided exclude Sonny Weems sample from the 
 dataset.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Games}
 ggplot(aes(x=G), data = df) +
   geom_histogram(binwidth = 4) +
   xlab("Games")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, PTS}
 ggplot(aes(x=PTS), data = df) +
   geom_histogram(binwidth = 50) +
   xlab("Total Points")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, PTS_Summary}
 summary(df$PTS)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Log_PTS}
 ggplot(aes(x=PTS+1), data = df) +
   geom_histogram(bins=200) +
   scale_x_log10() +
@@ -124,7 +128,7 @@ distribution of total points between players. There seems to be a unimodal peak
 near 1000 region. Generally, more minutes played, more chance for points an 
 athelete gets. So, how about the minutes played?
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, MP}
 ggplot(aes(x=MP), data = df) +
   geom_histogram(binwidth = 50) +
   xlab("Minutes Played")
@@ -134,7 +138,7 @@ Both total points and minutes played show a similar pyramidic pattern, with only
 a handful making their way up top. Then, I wonder, would points per minute 
 played be drastically different from those patterns?
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, PPM}
 ggplot(aes(x=PPM), data = df) +
   geom_histogram(binwidth = .05) +
   xlab("Points Per Minute")
@@ -143,62 +147,62 @@ ggplot(aes(x=PPM), data = df) +
 Quite surprisingly, points per minute actually shows a unimodal, normal-like 
 curve with the mean around 0.39, with a few glaring outliers.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, PPM_Summary}
 summary(df$PPM)
 ```
 
-Now that we examined PTS & minutes played, I want to examine other indicators
-that conjure up the offense. For field goals, I believe that the FG% is a
-better indicator of a scorer's ability than numbers made or attempted, so I will
-examine that as a main feature of field goal.
+Now that we examined PTS & minutes played, turning it into point per minute, 
+I want to examine other indicators that conjure up the offense. For field goals,
+I believe that the FG% is a better indicator of a scorer's ability than numbers 
+made or attempted, so I will examine that as a main feature of field goal.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, FG}
 ggplot(aes(x=FG.), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("Field Goal %")
 ```
 
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, FG_Summary}
 summary(df$FG.)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, NO_FG}
 subset(df, is.na(df$FG.))
 ```
 
-The NAs in FG. indicate that the user did not take any field goals at 
+The NAs in FG. indicate that the athlete did not take any field goals at 
 all. They have 0 attempts, and 0 made.
 
 Similarly, free throw % and 2-pointer / 3-pointer % will be examined instead of
 made and attempted.
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, FT}
 ggplot(aes(x=FT.), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("Free Throw %")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, FT_Summary}
 summary(df$FT.)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, X2PT}
 ggplot(aes(x=X2P.), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("2-Point %")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, X2PT_Summary}
 summary(df$X2P.)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, X3PT}
 ggplot(aes(x=X3P.), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("3-Point %")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, X3PT_Summary}
 summary(df$X3P.)
 ```
 
@@ -206,10 +210,10 @@ All four of the field goal related features show a normal-like curve, with some
 outliers. However, the number of players with 3-pointer% at 0 are unusually 
 high.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, No_X3PT}
 count(subset(df, df$X3P. == 0))
 ```
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, X3PTA_Summary}
 summary(subset(df, df$X3P. == 0)[,c("X3P", "X3PA", "X3P.")])
 ```
 
@@ -219,28 +223,28 @@ athletes are generally very small, and all ended up with 0 made.
 Since we checked the field goals already, let's check other numbers that conjure
 an offense - assist, steal, offensive rebound, and turnover.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, APM}
 ggplot(aes(x=APM), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("Assists per Minute")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, APM_Summary}
 summary(df$APM)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, SPM}
 ggplot(aes(x=SPM), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("steals per minute")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, SPM_Summary}
 summary(df$SPM)
 ```
 
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, ORPM}
 ggplot(aes(x=ORPM), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("offensive rebound per minute")
@@ -249,44 +253,44 @@ While assist has formed a normal-like distribution, both steal and offensive
 rebound forms a long-tailed graph. Lastly, we will examine the profiles of the
 athletes, with height, weight, age, and position.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, ORPM_Summary}
 summary(df$ORPM)
 ```
 
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, TPM}
 ggplot(aes(x=TPM), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("turnover per minute")
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, TPM_Summary}
 summary(df$TPM)
 ```
 
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, height}
 ggplot(aes(x=height), data = df) +
   geom_histogram(binwidth = 5)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, weight}
 ggplot(aes(x=weight), data = df) +
   geom_histogram(binwidth = 5)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, height_weight}
 ggplot(aes(x=height / weight), data = df) +
   geom_histogram(binwidth = 0.05)
 ```
 height-weight ratio has a normal-like distribution.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Age}
 ggplot(aes(x=Age), data = df) +
   geom_histogram(binwidth = 1)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Position}
 ggplot(aes(x=Pos), data = df) +
   geom_bar()
 ```
@@ -305,7 +309,7 @@ gather your observations and add your own if you have other thoughts!
 
 There are 1173 players in the dataset with 50 features.
 Position is a factor variable with the following level.
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, Pos_level}
 levels(df$Pos)
 ```
  "C", "C-F", "C-PF", "C-SF", "F", "F-C", "F-G",  "G",  "G-F", "PF", "PF-C",
@@ -341,12 +345,6 @@ of the data? If so, why did you do this?
 
 # Bivariate Plots Section
 
-> **Tip**: Based on what you saw in the univariate plots, what relationships
-between variables might be interesting to look at in this section? Don't limit
-yourself to relationships between a main output feature and one of the
-supporting variables. Try to look at relationships between supporting variables
-as well.
-
 Before we dive into the variables, let's make sense of the correlation of our 
 main variable, points per minute(PPM), to other possibly affecting variables.
 
@@ -375,7 +373,7 @@ athletes' point scoring ability.
 Let's examine the first point, with field goal percentage, 2-pointer percentage, 
  and 3-pointer percentage in relation to point per minute.
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, FG_PPM}
 ggplot(aes(x=FG., y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm") +
@@ -385,7 +383,7 @@ ggplot(aes(x=FG., y=PPM), data = df) +
 
 To take a closer look at the main area, let's zoom in:
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, FG_PPM_Zoom}
 ggplot(aes(x=FG., y=PPM), data = df) +
   geom_jitter(alpha = 0.4) +
   geom_smooth(method = "lm") +
@@ -394,7 +392,7 @@ ggplot(aes(x=FG., y=PPM), data = df) +
   xlab("Field Goal Percentage")
 ```
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, X2P_PPM}
 ggplot(aes(x=X2P., y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm") +
@@ -402,7 +400,7 @@ ggplot(aes(x=X2P., y=PPM), data = df) +
 ```
 
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, X3P_PPM}
 ggplot(aes(x=X3P., y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm") + 
@@ -422,7 +420,7 @@ high correlation between turnover per minute(TPM) and point per minute. It is
 quite counter-intuitive, as turnover generally means that you coughed up your
 ball, and in general, ball handling is emphasized in the pro scene.
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, TPM_PPM}
 ggplot(aes(x=TPM, y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm") + 
@@ -432,7 +430,7 @@ ggplot(aes(x=TPM, y=PPM), data = df) +
 A positive tendency is quite strong. Let us examine the concentrated area, from 
 around 0.01 to 0.1.
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, TPM_PPM_Zoom}
 ggplot(aes(x=TPM, y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm") + 
@@ -444,9 +442,9 @@ The tendency seems even clearer, even though there seems to be a spread towards
 the higher end, a bit like a cone shape. Let's examine some of the high TOM 
 personnels, in top 90% percentile.
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, High_TPM}
 High_T = arrange(subset(df, TPM > quantile(df$TPM, .9, na.rm = TRUE)), desc(PPM))
-High_T
+head(High_T, 10)
 ```
 
 Except for some the outliers whose game stinct was quite brief, you find some 
@@ -454,7 +452,7 @@ interesting names - Curry, KD, DeMarcus, Harden, LeBron James, and so on. These
 athletes are entrusted with leading the charge, the primary ball handlers. Thus,
 high turnover per minute is quite natural to them.
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, PPM_High_TPM}
 ggplot(aes(x=PPM), data = High_T) +
   geom_histogram(binwidth = 0.05) +
   xlab("Point per Minute")
@@ -463,21 +461,19 @@ ggplot(aes(x=PPM), data = High_T) +
 This is the summary of point per minute, for athletes with high turnovers per 
 minute:
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, PPM_High_TPM_Summary}
 summary(High_T$PPM)
 ```
 
 This is the summary of point per minute, over whole dataset:
 
-```{r echo=FALSE, Univariate_Plots}
-ggplot(aes(x=PPM), data = High_T) +
-  geom_histogram(binwidth = 0.05) +
-  xlab("Point per Minute")
+```{r echo=FALSE, PPM_Summary2}
+summary(df$PPM)
 ```
 
 The difference is quite staggering.
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, Cor_TPM}
 M = cor(df[, c("PPM", "Age", "FG.", "FT.", "X3P.", "X2P.", "ORPM", "APM", "SPM", "TPM", "FPM", "height", "weight")], use = "pairwise.complete.obs")
 M[, "TPM"]
 ```
@@ -516,14 +512,8 @@ per minute was higher than the broken down domains of 3-pointer percentage and
 
 # Multivariate Plots Section
 
-> **Tip**: Now it's time to put everything together. Based on what you found in
-the bivariate plots section, create a few multivariate plots to investigate
-more complex interactions between variables. Make sure that the plots that you
-create here are justified by the plots you explored in the previous section. If
-you plan on creating any mathematical models, this is the section where you
-will do that.
 
-```{r echo=FALSE, Multivariate_Plots}
+```{r echo=FALSE, PPM_FG_POS}
 ggplot(aes(x=FG., y=PPM), data = df) +
   geom_jitter(alpha = 0.2) +
   geom_smooth(method = "lm")+
@@ -537,7 +527,7 @@ position, the field goal percentage does not show such a correlation. The
 correlation between points per minute and field goal percentage, for centers, is
 small as shown below:
 
-```{r echo=FALSE, Multivariate_Plots}
+```{r echo=FALSE, C_PPM_FG_cor}
 C = subset(df, Pos == "C")
 cor(C$PPM, C$FG., use = "complete.obs")
 ```
@@ -545,60 +535,89 @@ cor(C$PPM, C$FG., use = "complete.obs")
 Excluding the centers, the correlation between points per minute and field goal 
 percentage becomes quite strong:
 
-```{r echo=FALSE, Multivariate_Plots}
+```{r echo=FALSE, D_PPM_FG_cor}
 D = subset(df, Pos != "C")
 cor(D$PPM, D$FG., use = "complete.obs")
 ```
 
 This is greater than the correlation as whole.
-Then, for centers, which variable has high correlation to points per minute?
 
-```{r echo=FALSE, Multivariate_Plots}
-M = cor(C[, c("PPM", "Age", "FG.", "FT.", "X3P.", "X2P.", "ORPM", "APM", "SPM", "TPM", "height", "weight", "FPM")], use = "pairwise.complete.obs")
-M[, "PPM"]
-```
-
-Personal fouls per minute(FPM) has a slight negative correlation, while the top
-indicators seems to be 3-pointer percentage(X3P.), assist per minute(APM), 
-steals per minute(SPM), and turnover per minute(TPM). Also, for the centers, 
-physical profiles, such as height, weight, and age, still seems to carry some 
-values when it comes to scoring.
-
-```{r echo=FALSE, Multivariate_Plots}
-ggplot(aes(x=Age, y=PPM), data = C) +
+```{r echo=FALSE, D_PPM_FG}
+ggplot(aes(x=FG., y=PPM), data = D) +
   geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm")+
+  xlab("Field Goal Percentage")
 ```
 
-```{r echo=FALSE, Multivariate_Plots}
-ggplot(aes(x=height, y=PPM), data = C) +
-  geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")
+```{r echo=FALSE, Density_FG_Pos}
+ggplot(aes(x=FG.), data = df) +
+  geom_density(aes(color = Pos)) +
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
 ```
 
-```{r echo=FALSE, Multivariate_Plots}
-ggplot(aes(x=height, y=PPM), data = subset(C, height > quantile(C$height, 0.1, na.rm=TRUE))) +
-  geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")
+```{r echo=FALSE, Density_PPM_Pos}
+ggplot(aes(x=PPM), data = df) +
+  geom_density(aes(color = Pos)) +
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
 ```
 
-```{r echo=FALSE, Multivariate_Plots}
-ggplot(aes(x=X3P., y=PPM), data = C) +
-  geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")
+This density plot add into the odd trend in field goal percentage and point per
+minute concerning centers. The centers, while having point per minute density 
+similar to other positions, have higher field goal percentage compared to
+the other positions.
+
+```{r echo=FALSE, BOX_FG_Pos}
+ggplot(aes(x=Pos,y=FG.), data = df) +
+  geom_boxplot() +
+  ylab("Field Goal Percentage")+
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
 ```
 
-```{r echo=FALSE, Multivariate_Plots}
-ggplot(aes(x=X3P., y=PPM), data = subset(C, X3P. > 0)) +
-  geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")
+This difference is even more stark when looking at box plot for field goal
+percentage, segmented by positions. Centers have a very high inter-quartile
+range, with the median way above the other positions.
+
+This implies that centers generally have higher field goal percentage when 
+compared to other positions. It is reasonable, as centers, generally, shoot 
+a lot closer to the rim than most of the other positions.
+
+```{r echo=FALSE, PPM_FG_Pos_Color}
+ggplot(aes(x=FG., y=PPM), data = df) +
+  geom_point(aes(color = Pos)) +
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
 ```
 
-```{r echo=FALSE, Multivariate_Plots}
-ggplot(aes(x=APM, y=PPM), data = C) +
-  geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")
+When visualized, centers reside much closer to the lower-right cluster of 
+field goal percentage - point per minute plot, with higher field goal percentage
+and lower point per minute. Also, higher spread compared to other positions, if 
+not regarding the outliers.
+
+The field goal percentage, as a whole, shows a weak linear relationship with the 
+points per minute, meaning that it can be, indeed, a variable which can be used
+to predict the point per game. However, given the big spread, the statistical
+power of the model will be quite weak.
+
+```{r echo=FALSE, LM}
+m1 <- lm((PPM ~ FG.), data = df)
+m2 <- update(m1, ~ . + TPM)
+m3 <- update(m2, ~ . + FT.)
+m4 <- update(m2, ~ . + Pos)
+mtable(m1, m2, m3, m4)
 ```
+
+The model can only explain 29.1% of the variance in the point per minute. There
+might be a feature which we have missed, or not exactly keeping track of as 
+a statistics right now. Using per minute stat does not change the r-squared much
+from adding both field goals attempted and field goals made, in place of per 
+minute stats.
 
 # Multivariate Analysis
 
@@ -606,54 +625,105 @@ ggplot(aes(x=APM, y=PPM), data = C) +
 investigation. Were there features that strengthened each other in terms of \
 looking at your feature(s) of interest?
 
+Position, generally, posed no noticable difference for points per minute. 
+However, the correlation of field goal percentage and points per minute on 
+centers were really small by comparison.
+
+In other positions, field goal percentage generally went with points per minute.
+
+
 ### Were there any interesting or surprising interactions between features?
+
+Field goal percentage by position. Centers had really high field goal percentage
+and I think closer shots taken by the centers are the reason for it.
 
 ### OPTIONAL: Did you create any models with your dataset? Discuss the \
 strengths and limitations of your model.
+
+I've tried modelling with linear regression, but r-squared is .29 - there should
+be some major feature / indicator that we missed, or could not find from the
+current stats.
 
 ------
 
 # Final Plots and Summary
 
-> **Tip**: You've done a lot of exploration and have built up an understanding
-of the structure of and relationships between the variables in your dataset.
-Here, you will select three plots from all of your previous exploration to
-present here as a summary of some of your most interesting findings. Make sure
-that you have refined your selected plots for good titling, axis labels (with
-units), and good aesthetic choices (e.g. color, transparency). After each plot,
-make sure you justify why you chose each plot by describing what it shows.
-
 ### Plot One
 ```{r echo=FALSE, Plot_One}
-
+ggplot(aes(x=PPM), data = df) +
+  ggtitle("Points Per Minute") +
+  geom_histogram(binwidth = .01) +
+  scale_x_continuous(limits = c(quantile(df$PPM, 0.025, na.rm = TRUE), quantile(df$PPM, 0.975, na.rm = TRUE))) + 
+  xlab("Points Per Minute") + 
+  ylab("Number of Athletes")
 ```
 
 ### Description One
-
+The distribution of points per minute shows a unimodal data, indicating that the
+athletes have normal-like distribution for their expected points per minute.
 
 ### Plot Two
 ```{r echo=FALSE, Plot_Two}
-
+ggplot(aes(x=FG., y=PPM), data = df) +
+  ggtitle("Points Per Minute by Field Goal Percentage,\n Segmented by Position") +
+  scale_x_continuous(limits = c(0.25, 0.6)) +
+  scale_y_continuous(limits = c(0.0, 1.0)) +
+  geom_jitter(alpha = 0.2) +
+  geom_smooth(method = "lm")+
+  facet_wrap(~Pos) + 
+  ylab("Points Per Minute") +
+  xlab("Field Goal Percentage")
 ```
 
 ### Description Two
-
+While points per minute and field goal percentage generally have a positive 
+correlation, for centers it is rather neutral, with almost flat correlation.
+For the centers, their field goal percentage is bunched up to the right side of 
+our x-axis, meaning that they generally have higher field goal percentage, and
+their spread is a bit wider, showing no consistent relationship.
 
 ### Plot Three
 ```{r echo=FALSE, Plot_Three}
-
+p1 <- ggplot(aes(x=Pos,y=FG., fill = Pos), data = df) +
+  ggtitle("Field Goal Percentage by Position") +
+  geom_boxplot() +
+  ylab("Field Goal Percentage")+
+  scale_fill_brewer(type = 'qual')
+p2 <- ggplot(aes(x=FG.), data = df) +
+  ggtitle("Field Goal Percentage Density by Position") +
+  geom_density(aes(color = Pos)) +
+  xlab("Field Goal Percentage")+
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
+grid.arrange(p1, p2, ncol = 1)
 ```
 
 ### Description Three
+Athletes with position Center(C) has the highest median field goal percentage.
+A greater proportion of centers have higher field goal percentage. There are 
+less outliers in center position, as well.
 
 ------
 
 # Reflection
 
-> **Tip**: Here's the final step! Reflect on the exploration you performed and
-the insights you found. What were some of the struggles that you went through?
-What went well? What was surprising? Make sure you include an insight into
-future work that could be done with the dataset.
+This dataset contains information on all players and their stats from 1950 - 
+2017(partial). However, to better reflect modern basketball, I've only used 
+2016-2017 as my sample. I started by looking through individual variables, 
+making estimates on which variable might be impactful on my main variable, which
+was point per minute. 
 
-> **Tip**: Don't forget to remove this, and the other **Tip** sections before
-saving your final work and knitting the final report!
+The trend between field goal percentage and points per minute was found, albeit
+not very strong. I was surprised by the fact that the position actually had
+a big impact on field goal percentage. Centers were, in general, more efficient
+in scoring field goals then others. I hoped I have a bit more data to dive in 
+and elaborate on this phenomenon. Average shooting distance, for example, would
+be a great feature to have and analyze - I'm quite sure this is what contributed
+to the scoring efficiency of the centers.
+
+There are some limitations with this approach: This season may be an abnormality
+when compared to other seasons. Also, it is based on the game statistics, which
+can be bolstered by the addition of several features. Also, my model was quite 
+off, primarily due to the data having great spread in terms of field goal 
+percentage and points per minute.
