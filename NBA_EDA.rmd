@@ -1,3 +1,6 @@
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
 Stats of NBA Players by Hyun Jin Lee
 ========================================================
 #Abstract
@@ -43,6 +46,7 @@ roster during 2016-17 season and played more than a minute throughout the season
 pl = read.csv("Players.csv")
 st = read.csv("Seasons_Stats.csv")
 df = left_join(st, pl, by="Player")
+df <- df[!is.na(df$Player),]
 df <- subset(df, Year == 2016)
 #df <- subset(df, Year >= 2000)
 df$PPM <- df$PTS / df$MP
@@ -72,7 +76,7 @@ str(df)
 summary(df)
 ```
 
-Our dataset consists of 52 variables, with the majority of the metrics coming
+Our dataset consists of 56 variables, with the majority of the metrics coming
 from https://www.basketball-reference.com/about/glossary.html.
 
 ```{r echo=FALSE, Multi_Position_Players}
@@ -81,17 +85,13 @@ which(df$Pos == "PF-C")
 #Channing Frye
 df[166, "Pos"] <- "PF"
 
-#Lauvergne
-df[888, "Pos"] <- "C"
-
 #extracting Weems
 df = subset(df, Pos != "SG-SF")
 ```
 
-There are only three players, out of 1173, who have a dual-position as their
+There are only two players, out of 578, who have a dual-position as their
 position. For the consistency, these outliers were addressed manually. As Frye 
-is registered as forward on official NBA website. For Joffrey Lauvergne, the NBA
-states his position as a center. These two are quite clear, and were adjusted as
+is registered as forward on official NBA website, his position was adjusted as
 such. However, Sonny Weems is a different case - he was, indeed, a tweener, and
 was assigned both SG and SF for his role. Since he is an extreme outlier, and
 the sample size is big enough that the exemption of one sample will not change
@@ -120,8 +120,6 @@ ggplot(aes(x=PTS+1), data = df) +
   scale_x_log10() +
   xlab("Total Points")
 ```
-
-
 
 Transformed the long-tail data using log10, to better understand the
 distribution of total points between players. There seems to be a unimodal peak
@@ -176,6 +174,7 @@ all. They have 0 attempts, and 0 made.
 
 Similarly, free throw % and 2-pointer / 3-pointer % will be examined instead of
 made and attempted.
+
 ```{r echo=FALSE, FT}
 ggplot(aes(x=FT.), data = df) +
   geom_histogram(binwidth = 0.01) +
@@ -249,6 +248,7 @@ ggplot(aes(x=ORPM), data = df) +
   geom_histogram(binwidth = 0.01) +
   xlab("offensive rebound per minute")
 ```
+
 While assist has formed a normal-like distribution, both steal and offensive
 rebound forms a long-tailed graph. Lastly, we will examine the profiles of the
 athletes, with height, weight, age, and position.
@@ -283,6 +283,7 @@ ggplot(aes(x=weight), data = df) +
 ggplot(aes(x=height / weight), data = df) +
   geom_histogram(binwidth = 0.05)
 ```
+
 height-weight ratio has a normal-like distribution.
 
 ```{r echo=FALSE, Age}
@@ -294,6 +295,7 @@ ggplot(aes(x=Age), data = df) +
 ggplot(aes(x=Pos), data = df) +
   geom_bar()
 ```
+
 Lack of multi-position players indicates that in modern basketball, position is
 very specific and well-defined.
 
@@ -307,7 +309,7 @@ gather your observations and add your own if you have other thoughts!
 
 ### What is the structure of your dataset?
 
-There are 1173 players in the dataset with 50 features.
+There are 578 players in the dataset with 56 features.
 Position is a factor variable with the following level.
 ```{r echo=FALSE, Pos_level}
 levels(df$Pos)
@@ -452,12 +454,6 @@ interesting names - Curry, KD, DeMarcus, Harden, LeBron James, and so on. These
 athletes are entrusted with leading the charge, the primary ball handlers. Thus,
 high turnover per minute is quite natural to them.
 
-```{r echo=FALSE, PPM_High_TPM}
-ggplot(aes(x=PPM), data = High_T) +
-  geom_histogram(binwidth = 0.05) +
-  xlab("Point per Minute")
-```
-
 This is the summary of point per minute, for athletes with high turnovers per 
 minute:
 
@@ -484,6 +480,48 @@ is also quite reasonable, as our list of top turnover per minute athletes were
 the primary ball handlers for the team, leading attack and responsible for 
 scoring and creating for teammates. 
 
+How about the positions? We know that positions define the role, with the 
+centers and power forwards operating nearer to the goal. Guards, generally,
+operate on the perimeter. Does the position of an athlete have any impact?
+
+```{r echo=FALSE, Density_FG_Pos}
+ggplot(aes(x=FG.), data = df) +
+  geom_density(aes(color = Pos)) +
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
+```
+
+```{r echo=FALSE, Density_PPM_Pos}
+ggplot(aes(x=PPM), data = df) +
+  geom_density(aes(color = Pos)) +
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
+```
+
+This density plot shows an odd trend in field goal percentage and point per
+minute concerning centers. The centers, while having point per minute density 
+similar to other positions, have higher field goal percentage compared to
+the other positions.
+
+```{r echo=FALSE, BOX_FG_Pos}
+ggplot(aes(x=Pos,y=FG.), data = df) +
+  geom_boxplot() +
+  ylab("Field Goal Percentage")+
+  scale_color_brewer(type = 'qual',
+    guide = guide_legend(title = 'Positions', reverse = T,
+    override.aes = list(alpha = 1, size = 2)))
+```
+
+This difference is even more stark when looking at box plot for field goal
+percentage, segmented by positions. Centers have a very high inter-quartile
+range, with the median way above the other positions. This relationship 
+between field goal percentage, point per minute, and position poses an 
+interesting question, and thus will be examined further in the multivariate 
+section.
+
+
 # Bivariate Analysis
 
 ### Talk about some of the relationships you observed in this part of the \
@@ -500,7 +538,8 @@ well.
 
 Turnovers per minute(TPM) has a strong positive correlation with assist per 
 minute(APM), which is quite plausible as the athletes whose turnovers per minute
-was the highest were the primary ball handlers for their team.
+was the highest were the primary ball handlers for their team. Also, centers 
+had higher field goal percentage relatively.
 
 ### What was the strongest relationship you found?
 
@@ -542,50 +581,10 @@ cor(D$PPM, D$FG., use = "complete.obs")
 
 This is greater than the correlation as whole.
 
-```{r echo=FALSE, D_PPM_FG}
-ggplot(aes(x=FG., y=PPM), data = D) +
-  geom_jitter(alpha = 0.2) +
-  geom_smooth(method = "lm")+
-  xlab("Field Goal Percentage")
-```
-
-```{r echo=FALSE, Density_FG_Pos}
-ggplot(aes(x=FG.), data = df) +
-  geom_density(aes(color = Pos)) +
-  scale_color_brewer(type = 'qual',
-    guide = guide_legend(title = 'Positions', reverse = T,
-    override.aes = list(alpha = 1, size = 2)))
-```
-
-```{r echo=FALSE, Density_PPM_Pos}
-ggplot(aes(x=PPM), data = df) +
-  geom_density(aes(color = Pos)) +
-  scale_color_brewer(type = 'qual',
-    guide = guide_legend(title = 'Positions', reverse = T,
-    override.aes = list(alpha = 1, size = 2)))
-```
-
-This density plot add into the odd trend in field goal percentage and point per
-minute concerning centers. The centers, while having point per minute density 
-similar to other positions, have higher field goal percentage compared to
-the other positions.
-
-```{r echo=FALSE, BOX_FG_Pos}
-ggplot(aes(x=Pos,y=FG.), data = df) +
-  geom_boxplot() +
-  ylab("Field Goal Percentage")+
-  scale_color_brewer(type = 'qual',
-    guide = guide_legend(title = 'Positions', reverse = T,
-    override.aes = list(alpha = 1, size = 2)))
-```
-
-This difference is even more stark when looking at box plot for field goal
-percentage, segmented by positions. Centers have a very high inter-quartile
-range, with the median way above the other positions.
-
-This implies that centers generally have higher field goal percentage when 
-compared to other positions. It is reasonable, as centers, generally, shoot 
-a lot closer to the rim than most of the other positions.
+This, along with the plots of field goal percentage and positions done at the 
+bivariate section, implies that centers generally have higher field goal 
+percentage when compared to other positions. It is reasonable, as centers, 
+generally, shoot a lot closer to the rim than most of the other positions.
 
 ```{r echo=FALSE, PPM_FG_Pos_Color}
 ggplot(aes(x=FG., y=PPM), data = df) +
