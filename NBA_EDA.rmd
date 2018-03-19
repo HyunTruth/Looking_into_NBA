@@ -303,10 +303,6 @@ very specific and well-defined.
 
 # Univariate Analysis
 
-> **Tip**: Now that you've completed your univariate explorations, it's time to
-reflect on and summarize what you've found. Use the questions below to help you
-gather your observations and add your own if you have other thoughts!
-
 ### What is the structure of your dataset?
 
 There are 578 players in the dataset with 56 features.
@@ -339,10 +335,6 @@ played). This is a better indicator of the athlete's proficiency in scoring than
 total points scored, which can be biased by the length of their playing time.
 Also, assist / steal / offensive rebounds / turnover are all converted to a per
 minute metric.
-
-### Of the features you investigated, were there any unusual distributions? \
-Did you perform any operations on the data to tidy, adjust, or change the form \
-of the data? If so, why did you do this?
 
 
 # Bivariate Plots Section
